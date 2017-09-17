@@ -12,11 +12,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import mbo.orm.backend.business.orders.caracteristics.Side;
 import mbo.orm.backend.business.orders.caracteristics.TimeInForce;
 import mbo.orm.backend.business.orders.containers.IOrderContainer;
 import mbo.orm.backend.business.orders.factories.OrderFactory;
 import mbo.orm.backend.business.orders.simple.IOrder;
+import mbo.orm.backend.business.orders.utils.MergingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -32,13 +34,9 @@ public class OrderServices implements ORMRoutes {
 
     private final static OrderServices INSTANCE = new OrderServices();
     private final static Logger LOGGER = LoggerFactory.getLogger(OrderServices.class);
-    private IOrder order2;
-    private IOrder order1;
-    private IOrder merged1;
-    private IOrder order3;
-    private IOrder order4;
-    private IOrder merged2;
     private IOrderContainer program;
+    private MergingResult merging1;
+    private MergingResult merging2;
 
     private OrderServices() {
 
@@ -79,12 +77,18 @@ public class OrderServices implements ORMRoutes {
     }
     
     public void initFakeData() {
-        this.order1 = OrderFactory.buildBasicOrder(BigInteger.ZERO, "ORA FP", BigDecimal.TEN, Side.SELL, TimeInForce.DAY);
-        this.order2 = OrderFactory.buildBasicOrder(BigInteger.ONE, "ORA FP", BigDecimal.valueOf(2500l), Side.SELL, TimeInForce.DAY);
-        this.merged1 = OrderFactory.mergeOrders(order1, order2);
-        this.order3 = OrderFactory.buildBasicOrder(BigInteger.ZERO, "ACA FP", BigDecimal.TEN, Side.BUY, TimeInForce.GTC);
-        this.order4 = OrderFactory.buildBasicOrder(BigInteger.ONE, "ACA FP", BigDecimal.valueOf(2500l), Side.BUY, TimeInForce.GTC);
-        this.merged2 = OrderFactory.mergeOrders(order3, order4);
-        this.program = OrderFactory.programOrders(merged1, merged2);
+        ArrayList<IOrder> orders1 = new ArrayList<>();
+        ArrayList<IOrder> orders2 = new ArrayList<>();
+        for (int i = 0 ; i < 10 ; i++) {
+            IOrder order = OrderFactory.buildBasicOrder(BigInteger.valueOf(i), "ORA FP", BigDecimal.TEN, Side.SELL, TimeInForce.GTD);
+            orders1.add(order);
+        }
+        this.merging1 = OrderFactory.mergeOrders(orders1);
+        for (int j = 0 ; j < 15 ; j++) {
+            IOrder order = OrderFactory.buildBasicOrder(BigInteger.valueOf(j), "ACA FP", BigDecimal.TEN, Side.BUY, TimeInForce.GTD);
+            orders2.add(order);
+        }
+        this.merging2 = OrderFactory.mergeOrders(orders2);
+        this.program = OrderFactory.programOrders(merging1.getMerged(), merging2.getMerged());
     }
 }

@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mbo.orm.backend.business.orders;
+package mbo.orm.backend.business.orders.containers;
 
 import java.util.Collection;
+import mbo.orm.backend.business.orders.simple.IOrder;
 
 /**
  *
  * @author maxime
  */
 public interface IOrderContainer {
-    public boolean hasSubContainer();
-    public Collection<IOrderContainer> getSubContainer();
+    public Collection<IOrder> getOrders();
 }

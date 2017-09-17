@@ -21,7 +21,9 @@ public class ORMServices {
         port(8080);
         Logger logger = LoggerFactory.getLogger(ORMServices.class);
         logger.info("Initialize order services");
-        OrderServices.getInstance().initServices();
+        OrderServices osInstance = OrderServices.getInstance();
+        osInstance.initServices();
+        osInstance.initFakeData();
         logger.info("Initialize securities services");
         SecurityServices.getInstance().initServices();
     }
